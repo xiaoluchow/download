@@ -23,12 +23,20 @@ public class MonitorThread implements Runnable{
 					while(startIterator.hasNext()){
 						Long start = startIterator.next();
 						InputStream is = stream.get(start);
-						WriteFileThread thread = new WriteFileThread(is, file, start);
+						
+							InputStream cloneIS = is;
+							stream.remove(start);
+							System.out.println("开始写文件"+file+"，从"+start+"开始");
+							WriteFileThread thread = new WriteFileThread(cloneIS, file, start);
+							new Thread(thread).start();
+						
 					}
 				}
 			}
 			try {
-				Thread.sleep(1000);
+				System.out.println("没有文件可写，睡眠2s");
+				Thread.sleep(2000);
+				
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

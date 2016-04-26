@@ -16,14 +16,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import junit.framework.Assert;
-
 public class Tools {
 	
 	public static void writeRandomAccessFile(InputStream is, String file, Long start) throws IOException{
-		Assert.assertNotNull(is);
-		Assert.assertNotNull(file);
-		Assert.assertNotNull(start);
+		assert is != null;
+		assert file != null;
+		assert start != null;
 		int count = 0;
 		byte [] buffer = new byte[1024];
 		RandomAccessFile outputStream = new RandomAccessFile(file, "rw");
@@ -49,8 +47,8 @@ public class Tools {
 	}
 	
 	public static String getFileName(String url){
-		Assert.assertNotNull(url);
-		int index = url.lastIndexOf(url);
+		assert url != null;
+		int index = url.lastIndexOf("/");
 		if(index != -1){
 			return "e://"+url.substring(index);
 		}

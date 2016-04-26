@@ -15,7 +15,7 @@ import org.apache.http.client.methods.HttpGet;
  */
 public class DownloadContext {
 	
-	private Map<Integer, ConcurrentHashMap<Long, InputStream>> map = new HashMap<>();
+	private volatile Map<Integer, ConcurrentHashMap<Long, InputStream>> map = new HashMap<>();
 	
 	private FileNameCache fileNameCache = new FileNameCache();
 	
@@ -26,7 +26,8 @@ public class DownloadContext {
 	
 	public synchronized static DownloadContext getInstance(){
 		if(context == null){
-			return new DownloadContext();
+			context = new DownloadContext();
+			return context;
 		}else{
 			return context;
 		}
@@ -42,7 +43,8 @@ public class DownloadContext {
 				for(PartFile part : list){
 					DownloadThread download = new DownloadThread(url, part.getStart(), 
 							part.getEnd(), DownloadContext.getInstance());
-					download.run();
+					System.out.println("开始下载"+url+"的部分文件");
+					new Thread(download).start();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -60,8 +62,15 @@ public class DownloadContext {
 		DownloadContext dc = DownloadContext.getInstance();
 		List<String> list = new ArrayList<>();
 		String url1 = "https://dl.pandaidea.com/jarfiles/o/org.springframework.core/org.springframework.core-3.0.0.RELEASE.jar.zip";
+		String url2 = "https://dl.pandaidea.com/jarfiles/o/org.springframework.context/org.springframework.context.jar.zip";
+		String url3 = "https://dl.pandaidea.com/jarfiles/o/org.springframework.context/org.springframework.context.support-sources-3.0.5.RELEASE.jar.zip";
 		list.add(url1);
+		list.add(url2);
+		list.add(url3);
 		dc.multiDownload(list);
+		MonitorThread monitor = new MonitorThread();
+		monitor.setContext(dc);
+		new Thread(monitor).start();
 	}
 
 	public FileNameCache getFileNameCache() {
